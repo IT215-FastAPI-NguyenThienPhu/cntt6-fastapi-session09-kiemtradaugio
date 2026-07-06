@@ -25,7 +25,7 @@ def create_response(req: Request, status_code: int, message: str, data: Optional
             "message": message,
             "data": data,
             "error": error,
-            "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "timestamp": datetime.strftime(),
             "path": req.url.path
         }
     )
@@ -35,7 +35,7 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
     return create_response(
         req=request,
         status_code=exc.status_code,
-        message=getattr(exc, "custom_message", "Đã xảy ra lỗi hệ thống!"),
+        message=getattr(exc, "custom_message", "Đã xảy ra lỗi hệ thống"),
         error=exc.detail
     )
 
@@ -65,7 +65,7 @@ def create_course(req: Request, course_in: CourseCreateSchema):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="ERR-EDU-01: Course name duplicates an existing record in memory array."
             )
-            setattr(exc, "custom_message", "Lỗi: Tên khóa học này đã tồn tại trong danh mục đào tạo!")
+            setattr(exc, "custom_message", "Lỗi: Tên khóa học này đã tồn tại trong danh mục đào tạo")
             raise exc
     new_id = max([c["id"] for c in courses_db]) + 1 if courses_db else 1
     new_course = {
@@ -74,13 +74,13 @@ def create_course(req: Request, course_in: CourseCreateSchema):
         "duration_hours": course_in.duration_hours,
         "price": course_in.price,
         "status": "active",
-        "created_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        "created_at": datetime
     }
     courses_db.append(new_course)
     return create_response(
         req=req,
         status_code=status.HTTP_201_CREATED,
-        message="Tạo mới khóa học thành công!",
+        message="Tạo mới khóa học thành công",
         data=new_course
     )
 
@@ -96,11 +96,11 @@ def delete_course(req: Request, course_id: int):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="ERR-EDU-02: Target course ID can not be found."
         )
-        setattr(exc, "custom_message", "Lỗi: Không tìm thấy mã khóa học yêu cầu để xóa!")
+        setattr(exc, "custom_message", "Lỗi: Không tìm thấy mã khóa học yêu cầu để xóa")
         raise exc
     courses_db.remove(target_course)
     return create_response(
         req=req,
         status_code=status.HTTP_200_OK,
-        message="Xóa khóa học thành công!"
+        message="Xóa khóa học thành công"
     )
